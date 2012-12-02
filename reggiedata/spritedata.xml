@@ -470,7 +470,7 @@
   <sprite id="52" name="Incomplete Beta 4x Self-Rotating Platforms" notes="This platform is an incomplete model. Looks like it was going to be something like the &quot;Renzor&quot; wheel.">
     <checkbox nybble="8" title="Clockwise" comment="Rotates counter clockwise if not checked."/>
   </sprite>
-  <sprite id="53" name="Environment - Quicksand" notes="The Desert Tileset object, &quot;Type 24&quot;, is required to cause the sinking behavior. It's the object right before the Yellow block.">
+  <sprite id="53" name="Environment - Quicksand" notes="A quicksand Object, such as the Desert Tileset &quot;Object 24&quot;, is required to cause the sinking behavior. For example, it's a blank object, located right before the Yellow block in the sabaku (Desert) tileset, and Object 107 in the toride_sabaku (Desert Tower) tileset.">
     <checkbox nybble="10" title="Flat Top" mask="8" comment="Checking this removes the animated crest effect on the top portion of the sprite. Creates a 'square' look."/>
     <value nybble="11-12" title="Location ID" comment="Match with a Location to set the area of this sprite."/>
   </sprite>
@@ -604,7 +604,10 @@
     <value nybble="12" title="Length" comment="1 + Value"/>
   </sprite>
   <sprite id="63" name="Spike Ball">
-    <value nybble="9" title="Unknown Value 9" comment="0, 1 (Uses 1 in 6-24 A1)"/>
+    <list nybble="9" title="Acceleration" comment="This controls how fast the ball will change direction upon hitting a wall.">
+      <entry value="0">Slow</entry>
+      <entry value="1">Fast</entry>
+    </list>
     <list nybble="11" title="Direction">
       <entry value="0">Left</entry>
       <entry value="1">Right</entry>
@@ -612,7 +615,8 @@
     <list nybble="12" title="Speed">
       <entry value="0">Stopped</entry>
       <entry value="1">Slow</entry>
-      <entry value="2">Fast</entry>
+      <entry value="2">Medium</entry>
+      <entry value="3">Fast</entry>
     </list>
   </sprite>
   <sprite id="64" name="Environment - Outdoors Fog" notes="Can be placed with or without a Location ID. Creates a thick rolling fog effect.">
@@ -805,7 +809,7 @@
     <value nybble="12" title="Height" comment="Value + 1"/>
   </sprite>
   <sprite id="88" name="Incomplete Sprite - &quot;En_Boyon&quot;" notes="No code related."/>
-  <sprite id="89" name="Incomplete Sprite - &quot;En_Remocon_Torimochi&quot;" notes="No code related."/>
+  <sprite id="89" name="Incomplete Sprite - &quot;En_Remocon_Torimochi&quot;" notes="No code related. &quot;Remote Controlled Bird Trap&quot;"/>
   <sprite id="90" name="Effect - Wind Physics and Sound">
     <value nybble="5" title="Time Active" comment="Amount of time that the wind is on"/>
     <value nybble="6" title="Time Deactive" comment="Amount of time that the wind is off"/>
@@ -860,11 +864,10 @@
   </sprite>
   <sprite id="94" name="Boomerang Brother"/>
   <sprite id="95" name="Hammer Brother">
-    <list nybble="12" title="Unknown Value 12" comment="Initial jumping direction? No obvious change.">
-      <entry value="0">???</entry>
-      <entry value="1">???</entry>
-      <entry value="2">???</entry>
-      <entry value="3">???</entry>
+    <list nybble="12" title="Platforms" comment="Changes the amount of platforms the Hammer Bro. will use. Defaults and caps at 2.">
+      <entry value="0">2</entry>
+      <entry value="1">1</entry>
+      <entry value="2">2</entry>
     </list>
   </sprite>
   <sprite id="96" name="Rotation Controller - Swaying">
@@ -1604,16 +1607,16 @@
     <value nybble="12" title="Rope Width" comment="Distance between the left and right platforms. Minimum 1 (the green pulleys are next to each other)"/>
   </sprite>
   <sprite id="179" name="Special Exit Controller">
-    <list nybble="5" title="????" comment="0, 1, 2, 3 used, value is 0-F">
+    <list nybble="5" title="Type" comment="Sets the type of the exit.">
       <entry value="0">Normal</entry>
-      <entry value="1">Slightly Delayed?</entry>
+      <entry value="1">Delayed</entry>
       <entry value="2">Used in 7-Tower</entry>
       <entry value="3">Pipe Noise + Iris</entry>
     </list>
     <checkbox nybble="6" title="Walk Left, Exit Stage" mask="4" comment="If this is checked, the Special Exit will force mario to walk to the left and exit the stage with an iris effect. This does not complete the stage."/>
     <value nybble="6" title="????" comment="Game checks for 0-3, plus the Stage Exit flag."/>
     <value nybble="7" title="Exit ID Overflow" comment="Part of the Exit ID. If the target Exit ID is over 16 or higher, add 1 to this value for each 16, and place the remainder as the Exit ID"/>
-    <list nybble="8" title="????" comment="0, 1, 2, 3">
+    <list nybble="8" title="Requirement" comment="0, 1, 2, 3">
       <entry value="0">Normal</entry>
       <entry value="1">Requires Vine</entry>
       <entry value="2">???</entry>
@@ -1674,6 +1677,9 @@
       <entry value="1">Brick Block</entry>
       <entry value="3">Stone Block</entry>
       <entry value="4">Wooden Block</entry>
+      <entry value="6">Pa0 Tile 0x45</entry>
+      <entry value="8">Pa3 Tile 0x67</entry>
+      <entry value="12">Pa3 Tile 0x67</entry>
       <entry value="14">Ground Corner</entry>
     </list>
     <list nybble="10" title="Effect">
@@ -1792,7 +1798,7 @@
     </list>
   </sprite>
   <sprite id="204" name="Rolling Spike Ball/Barrel Generator">
-    <value nybble="3-4" title="Disable Spawn Event" comment="Disables spawning when event is activated."/>
+    <value nybble="3-4" title="Disable Spawn Event" comment="Disables spawning of spike balls when event is activated. You cannot disable spawning for barrels."/>
     <checkbox nybble="5" title="Spawn Barrels" comment="Changes to Rolling Barrel Generator"/>
     <list nybble="8" title="Speed" comment="Changes the spawned balls' speed.">
       <entry value="0">Stopped</entry>
@@ -1801,7 +1807,8 @@
     </list>
     <list nybble="9" title="Direction">
       <entry value="0">Left</entry>
-      <entry value="2">Right</entry>
+	  <entry value="1">Right</entry>
+      <entry value="2">Towards Mario</entry>
     </list>
     <value nybble="10" title="# of balls spawned" comment="0 = Infinite."/>
     <value nybble="12" title="Grouping" comment="If set to 1, spawns 3 balls next to each other with a pause between each of three spawnings. If set to 2, the pause between the group of 3 and another group of 3 is shorter than with 1.  If set to 3 or 4 the pause between EACH ball is long.  "/>
@@ -1892,7 +1899,7 @@
     </list>
     <checkbox nybble="8" title="Appears Behind Other Sprites" comment="Check to make it appear behind other sprites/objects on layer 1"/>
     <checkbox nybble="9" title="Starts Going Left" comment="Starts on a line by going left instead of right"/>
-    <checkbox nybble="10" title="Follows Line" comment="Check to make it follow Pa4 Lines"/>
+    <checkbox nybble="10" title="Follows Line" comment="Check to make it follow Pa3 Lines"/>
   </sprite>
   <sprite id="208" name="Question Block - Unused">
     <value nybble="5-6" title="Movement ID" comment="Link to Movement Controllers to make this sprite move with them."/>
@@ -1972,7 +1979,7 @@
       <entry value="15">Ice Flower</entry>
     </list>
     <checkbox nybble="8" title="Place Behind Other Sprites" comment="Check to make it appear behind other sprites and objects on layer 1"/>
-    <checkbox nybble="10" title="Follows Line" comment="Check to make it follow Pa4 Lines"/>
+    <checkbox nybble="10" title="Follows Line" comment="Check to make it follow Pa3 Lines"/>
     <checkbox nybble="9" title="Starts Going Left" comment="Check to make it start going left instead of right"/>
   </sprite>
   <sprite id="210" name="Incomplete Sprite - &quot;Tarzan_Rope&quot;" notes="Flag x08 - Seems to have no functioning data associated with it. Presumed incomplete."/>
@@ -1994,14 +2001,14 @@
     <value nybble="11" title="Speed"/>
     <checkbox nybble="12" title="Clockwise" comment="Counter Clockwise if unchecked."/>
   </sprite>
-  <sprite id="213" name="Incomplete Beta Platform" notes="Sprite does not function. Class name is &quot;Branch&quot;"/>
+  <sprite id="213" name="Incomplete Platform - &quot;Branch&quot;" notes="Sprite does not function. "/>
   <sprite id="214" name="Freefall Ghost House Platform" notes="arc contains 1 texture, 1 model">
     <value nybble="9" title="Unknown Value 9" comment="1, 5"/>
     <value nybble="10" title="Unknown Value 10" comment="4"/>
     <value nybble="11" title="Movement ID" comment="Known linked sprites: 159 - Paths"/>
   </sprite>
   <sprite id="215" name="Bullet Bill Spawn Area">
-    <list nybble="7" title="Spacing of Multiple Bulle" comment="When used with &quot;number of bullets&quot; this controls the spacing of the groups.">
+    <list nybble="7" title="Spacing of Multiple Bullets" comment="When used with &quot;number of bullets&quot; this controls the spacing of the groups.">
       <entry value="0">0 blocks</entry>
       <entry value="1">1 block</entry>
       <entry value="2">2 blocks</entry>
@@ -2118,8 +2125,7 @@
     <checkbox nybble="12" title="Alternate Color Pattern" comment="Switches the green and white boxes."/>
   </sprite>
   <sprite id="224" name="Jumbo Ray">
-    <value nybble="8" title="Unknown Value 8" comment="0-7"/>
-    <value nybble="9" title="Unknown Value 9" comment="0-5, 8-E"/>
+    <value nybble="8-9" title="Delay" comment="Delay in ticks before flight"/>
     <checkbox nybble="10" title="Fly left" comment="The direction the Ray will fly."/>
     <value nybble="11" title="Altitude?" comment="0, 1, 2"/>
     <value nybble="12" title="Ray ID" comment="Link this with the Jumbo Ray Spawn Area (235)"/>
@@ -2724,8 +2730,10 @@
     </list>
     <checkbox nybble="10" title="Rotating Cannon" comment="Changes the direction from right to left between each shot."/>
     <list nybble="11-12" title="Cannon Direction" comment="This has 255 different variants. Everything past &quot;1&quot; and &quot;2&quot; seems to have the missile misplaced. ">
-      <entry value="0">Up and Right</entry>
-      <entry value="1">Down and right</entry>
+      <entry value="0">Up-Right</entry>
+      <entry value="1">Up-Left</entry>
+      <entry value=" 10">Down-Right</entry>
+      <entry value="11">Down-Left</entry>
     </list>
   </sprite>
   <sprite id="300" name="Cannon - 4-Way">
@@ -2814,7 +2822,13 @@
     <value nybble="11" title="Length" comment="Value + 2 (Maximum length of 9)"/>
     <value nybble="12" title="Flame Jet ID" comment="Known matched sprites - 309"/>
   </sprite>
-  <sprite id="308" name="Hammer Brother - For Platforms (?)" notes="&quot;En_Lift_HammerBros&quot; Likely allows it to be used on places where he shouldn't jump off."/>
+  <sprite id="308" name="Hammer Brother - For Platforms (?)" notes="&quot;En_Lift_HammerBros&quot; Likely allows it to be used on places where he shouldn't jump off.">
+    <list nybble="1" title="Platforms" comment="Changes the amount of platforms the Hammer Bro. will use. Defaults and caps at 2.">
+      <entry value="0">2</entry>
+      <entry value="1">1</entry>
+      <entry value="2">2</entry>
+    </list>
+  </sprite>
   <sprite id="309" name="Synchronized Flame Jet ">
     <list nybble="10" title="Mode 1">
       <entry value="0">On</entry>
@@ -2942,7 +2956,7 @@
     </list>
     <checkbox nybble="12" title="Counter Clockwise" comment="Rotates clockwise if unchecked"/>
   </sprite>
-  <sprite id="324" name="Incomplete Sprite - &quot;Ship_Window&quot;" notes="Likely scrapped in favor of the tileset based windows. Does nothing, and has no settings."/>
+  <sprite id="324" name="Incomplete Sprite - &quot;Ship_Window&quot;" notes="No code. Probably scrapped in favor of tileset windows."/>
   <sprite id="325" name="Ghost House Stand"/>
   <sprite id="326" name="King Bill" notes="[RECHECK] (Spend some time figuring this one out. Might be relevant to screen positioning, and may repeat on stationary stages, but not on auto-scrolling ones.) 3 only works once the sprite has gone 'offscreen' to the left)">
     <value nybble="10" title="Speed" comment="0-15 Higher = Faster, Nintendo Uses 5-6"/>
@@ -3009,9 +3023,11 @@
       <entry value="1">Medium</entry>
       <entry value="2">Far</entry>
     </list>
-    <list nybble="12" title="Movement Type">
-      <entry value="0">Always Left</entry>
-      <entry value="3">Back and Forth</entry>
+    <list nybble="12" title="Type">
+      <entry value="0">Always swims left</entry>
+      <entry value="3">Swims back and forth</entry>
+      <entry value="7">Green (Aggressive)</entry>
+      <entry value="8">Yellow (Shy)</entry>
     </list>
     <list nybble="5" title="Start Direction (may not work)" comment="If &quot;Back and Forth&quot; is used [RECHECK] - I could not get him to go left... [Treeki comment: I couldn't get it to work either]">
       <entry value="0">Right</entry>
@@ -3444,11 +3460,16 @@
     </list>
   </sprite>
   <sprite id="396" name="Move-When-On Platform">
-    <value nybble="7" title="Rising Speed" comment="When unoccupied"/>
-    <value nybble="8" title="Falling Speed" comment="When occupied"/>
-    <checkbox nybble="10" title="Does not Rise" comment="Rises when unoccupied if unchecked."/>
-    <list nybble="11" title="Number of sprites required to move" comment="Value + 1. Makes the platform move only when this number of sprites is on it."/>
-    <value nybble="12" title="Length" comment="? + Value"/>
+    <list nybble="7" title="Direction" comment="Direction the platform will move when occupied.">
+      <entry value="0">Right</entry>
+      <entry value="1">Left</entry>
+      <entry value="2">Up</entry>
+      <entry value="3">Down</entry>
+    </list>
+    <value nybble="8" title="Speed" comment="The speed in which the platform will move when occupied."/>
+    <checkbox nybble="10" title="Does not Stop and Return" comment="Platform starts moving when occupied, however it does not return to its starting position and continues to move even when unoccupied."/>
+    <value nybble="11" title="Number of sprites required to move" comment="1 + Value. Makes the platform move only when this number of sprites is on it."/>
+    <value nybble="12" title="Length" comment="Platform will be length of value, however a length of 0 returns an platform 2 tiles wide without proper edges. Recommended value of 2 or higher."/>
   </sprite>
   <sprite id="397" name="Move-When-On Ghost House Boxes">
     <list nybble="7" title="Movement Direction">
@@ -3460,7 +3481,7 @@
     </list>
     <value nybble="8" title="Speed When Standing On"/>
     <value nybble="9" title="Height" comment="2 + Value"/>
-    <checkbox nybble="10" title="Retuns to Original Location"/>
+    <checkbox nybble="10" title="Returns to Original Location"/>
     <value nybble="11" title="Number of sprites required to move" comment="1 + Value. The platform will only move when this many sprites are on it."/>
     <value nybble="12" title="Width" comment="2 + Value"/>
   </sprite>

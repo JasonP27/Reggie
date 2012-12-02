@@ -1,16 +1,94 @@
-=== Reggie! Level Editor (Release 3) ===
+=== Reggie! Level Editor Mod (Release 3.6) by JasonP27 ===
 
 Advanced level editor for New Super Mario Bros. Wii, created by Treeki and
 Tempus using Python, PyQt and Wii.py.
 
-Homepage: http://www.rvlution.net/reggie/
+3.6 version by JasonP27 modified from Reggie! Release 3 by Treeki and Tempus.
+
+Homepage: http://www.rvlution.net/reggie/ (Original Release)
 Support:  http://www.rvlution.net/forums/
 
-Source code package for this release:
+Source code package for Reggie 3:
 - http://www.rvlution.net/reggie/downloads/Reggie_r3_source.zip
-
+Source code for Reggie Mod:
+- http://github.com/JasonP27/Reggie/tree/reggiemod
 
 === Changelog: ===
+
+Release 3.6: (December 2nd, 2012) 
+
+-The following sprites now render using images:
+--
+*Giant Floating Bubble (with arrow overlay to show direction of travel)
+*Lighting - Rotation Controlled Spotlight
+*Path Controlled Block Train
+*Pipe Bubbles
+*Lighting - Underwater Lamp
+*Lighting - Giant Glow Block
+*Big Breakable Brick Block
+*Giant Wiggler
+*Move-When-On Platform
+*Chestnut Goomba
+*Rotation Controlled Event Deactivation Block
+*Bowser Switch (Small !)
+*Bowser Switch (Large !)
+*Fire Chomp
+*Move-When-On Ghost House Boxes
+*King Bill
+*Freefall Ghost House Platform
+*Rotation Controlled Cage Blocks
+*Floating Question Block
+--
+- Made NumberFont for Zones and Locations boxes bold.
+- Added 2px border to Tooltips
+- Added Tooltip to Area Options -> Default Events to explain purpose of default events.
+- Raw Data Textbox now turns red with bold white text when containing invalid data.
+- Minor changes to other tooltips (Area Timer, Shift Objects).
+- Two separate Reggie executables. One for normal light theme and one for dark theme, your choice :)
+
+For more information visit the Sprite Image Contributions thread on RVLution:
+- http://www.rvlution.net/forums/viewtopic.php?f=20&t=1226
+
+Special Thanks:
+to joietyfull64 for providing several images 
+to Treeki and Tempus for their help with PyQt
+various members of RVLution and DarkUmbra for their support and suggestions
+
+Release 3.5: (November 17th, 2012) 
+
+-The following sprites now render using images:
+--
+*Micro Goomba
+*Giant Goomba
+*Mega Goomba
+*Huckit Crab
+*Clam (including all contents)
+*Porcu-Puffer
+*Bulber
+*Jellybeam
+*Spiny Cheep-Cheep
+*Cheep-Chomp
+*Fishbones
+*Urchin
+*Mega Urchin
+*Fire Snake
+*Poltergeist Item (QBlock & Stand)
+*Jumbo Ray (including Fly Left/Right)
+*Little Mouser (Facing left and right, swarm of 1-4)
+*Roulette Block
+*Player Block
+*Player Block Platform
+*Invisible 1-Up - Mini Mario Only
+*Flying Question Block
+*Pipe Cannon
+*Box Generator
+*Moving Chain Link (with arrow overlay to show direction of travel)
+*Toad Balloon
+--
+-Increased number of Zoom Levels
+-Added Zoom to Minimum and Zoom to Maximum functions
+-Completely re-colored interface with darker style.
+
 
 Release 3: (April 2nd, 2011)
 - Unicode is now supported in sprite names within spritedata.xml

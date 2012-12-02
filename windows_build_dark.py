@@ -28,7 +28,7 @@ setup(
     version='3.6',
     description='Reggie! Level Editor Mod by JasonP27',
     windows=[
-        {'script': 'reggie_mod_light.py',
+        {'script': 'reggie_mod_dark.py',
          'icon_resources': [(0,'reggiedata/win_icon.ico')]}
     ],
     options={'py2exe':{

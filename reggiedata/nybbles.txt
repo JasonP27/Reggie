@@ -1,0 +1,12 @@
+Nybble 1: ord(sprite.spritedata[0]) >> 4
+Nybble 2: ord(sprite.spritedata[0]) & 15
+Nybble 3: ord(sprite.spritedata[1]) >> 4
+Nybble 4: ord(sprite.spritedata[1]) & 15
+Nybble 5: ord(sprite.spritedata[2]) >> 4
+Nybble 6: ord(sprite.spritedata[2]) & 15
+Nybble 7: ord(sprite.spritedata[3]) >> 4
+Nybble 8: ord(sprite.spritedata[3]) & 15
+Nybble 9: ord(sprite.spritedata[4]) >> 4
+Nybble 10: ord(sprite.spritedata[4]) & 15
+Nybble 11: ord(sprite.spritedata[5]) >> 4
+Nybble 12: ord(sprite.spritedata[5]) & 15
