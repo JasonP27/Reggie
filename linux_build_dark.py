@@ -29,7 +29,7 @@ setup(
         'build_exe': {'excludes': excludes}
     },
     executables=[
-        Executable("reggie_mod_light.py", copyDependentFiles=True, targetDir=dir)
+        Executable("reggie_mod_dark.py", copyDependentFiles=True, targetDir=dir)
     ]
 )
 
