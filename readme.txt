@@ -15,6 +15,68 @@ Source code for Reggie Mod:
 
 === Changelog: ===
 
+- Release 3.7: (January 31st, 2013) -
+
+-The following sprites now render using images:
+--
+*Path Controlled Ice Flow
+*Bowser
+*Iggy Koopa
+*Kamek
+*Ludwig Von Koopa
+*Morton Koopa
+*Roy Koopa
+*Larry Koopa
+*Lemmy Koopa
+*Wendy Koopa
+*Rotation Controlled Dish Platform
+*Rotation Controlled Hanging Chain Platform
+*Minigame Flip Panel
+*Effect Glare
+*Line Controlled Tilt Controlled Girder
+*Rising Tilt Controlled Girder
+*Rising Tilt Controlled Girder Controller
+*Line Platform with Bolt
+*Cannon - Multi Use
+*Airship Nut Platform
+*Continuous Flame Cannon
+*Synchronized Flame Jet
+*Rotating Flame Jet Cannon
+*Line Controlled Dragon Coaster
+*Sand Pillar
+*Lava Geyser
+--
+Other New Features:
+
+- Made NumberFont for Zones and Locations boxes bold in Dark version. (previously only in Light)
+- Added a new menu option to enable or disable the labels on the tabs
+- Added new option to menu and toolbar to enable or disable the viewing of sprites
+- Added new option to menu and toolbar to enable or disable the viewing of locations
+- Added and fixed various tooltips and descriptive text
+
+*Added a new tab: List
+- Like the Entrances tab only for Sprites, this tab lists every sprite loaded into Reggie (the current Area)
+- Like the Entrances tab, you can double-click an entry in the list to jump to it instantly
+- If the tab has focus, the currently selected sprite in the scene will be highlighted in the list
+- Lists several key aspects of the sprite:
+
+    *x,y position
+    *which events trigger it
+    *which events it activates
+    *Coin/Set ID
+    *Movement ID
+    *Rotation ID
+    *Location ID
+    *which Star Coin number it is
+
+For more information visit the Sprite Image Contributions thread on RVLution:
+- http://www.rvlution.net/forums/viewtopic.php?f=20&t=1226
+
+Special Thanks:
+- to joietyfull64 for providing several images
+- to Treeki his time and help
+- to various members of RVLution and DarkUmbra for their support and suggestions
+
 Release 3.6: (December 2nd, 2012) 
 
 -The following sprites now render using images:
@@ -50,9 +112,9 @@ For more information visit the Sprite Image Contributions thread on RVLution:
 - http://www.rvlution.net/forums/viewtopic.php?f=20&t=1226
 
 Special Thanks:
-to joietyfull64 for providing several images 
-to Treeki and Tempus for their help with PyQt
-various members of RVLution and DarkUmbra for their support and suggestions
+- to joietyfull64 for providing several images 
+- to Treeki and Tempus for their help with PyQt
+- various members of RVLution and DarkUmbra for their support and suggestions
 
 Release 3.5: (November 17th, 2012) 
 

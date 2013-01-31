@@ -1208,12 +1208,15 @@ ShowLayer1 = True
 ShowLayer2 = True
 ObjectsNonFrozen = True
 SpritesNonFrozen = True
+SpritesNonHidden = True
+TabsNamed = True
 EntrancesNonFrozen = True
 LocationsNonFrozen = True
 PathsNonFrozen = True
 PaintingEntrance = None
 PaintingEntranceListIndex = None
 NumberFont = None
+NumberFontBold = None
 GridEnabled = False
 RestoredFromAutoSave = False
 AutoSavePath = ''
@@ -1238,6 +1241,21 @@ def LoadNumberFont():
         NumberFont = QtGui.QFont('Lucida Grande', 9)
     else:
         NumberFont = QtGui.QFont('Sans', 8)
+
+def LoadNumberFontBold():
+    """Creates a valid font we can use to display the item numbers"""
+    global NumberFontBold
+    if NumberFontBold != None: return
+
+    # this is a really crappy method, but I can't think of any other way
+    # normal Qt defines Q_WS_WIN and Q_WS_MAC but we don't have that here
+    s = QtCore.QSysInfo()
+    if hasattr(s, 'WindowsVersion'):
+        NumberFontBold = QtGui.QFont('Tahoma', 7, QtGui.QFont.Bold)
+    elif hasattr(s, 'MacintoshVersion'):
+        NumberFontBold = QtGui.QFont('Lucida Grande', 9)
+    else:
+        NumberFontBold = QtGui.QFont('Sans', 8, QtGui.QFont.Bold)
 
 def SetDirty(noautosave=False):
     global Dirty, DirtyOverride, AutoSaveDirty
@@ -2189,7 +2207,7 @@ class ZoneItem(LevelEditorItem):
         """Creates a zone with specific data"""
         LevelEditorItem.__init__(self)
 
-        self.font = NumberFont
+        self.font = NumberFontBold
         self.id = id
         self.TitlePos = QtCore.QPointF(10,18)
         self.UpdateTitle()
@@ -2439,7 +2457,7 @@ class SpriteLocationItem(LevelEditorItem):
         """Creates a location with specific data"""
         LevelEditorItem.__init__(self)
 
-        self.font = NumberFont
+        self.font = NumberFontBold
         self.TitlePos = QtCore.QPointF(4,12)
         self.objx = x
         self.objy = y
@@ -2558,7 +2576,6 @@ class SpriteLocationItem(LevelEditorItem):
 
 
 
-
 class SpriteEditorItem(LevelEditorItem):
     """Level editor item that represents a sprite"""
     BoundingRect = QtCore.QRectF(0,0,24,24)
@@ -2574,6 +2591,7 @@ class SpriteEditorItem(LevelEditorItem):
         self.objx = x
         self.objy = y
         self.spritedata = data
+        self.listitem = None
         self.LevelRect = (QtCore.QRectF(self.objx/16, self.objy/16, 24/16, 24/16))
         self.ChangingPos = False
 
@@ -2591,6 +2609,9 @@ class SpriteEditorItem(LevelEditorItem):
         self.name = sname
         self.setToolTip('<b>Sprite %d:</b><br>%s' % (type,sname))
 
+    def UpdateListString(self):
+        self.listitem.setText(self.ListString())
+
     def SetType(self, type):
         """Sets the type of the sprite"""
         self.name = Sprites[type].name
@@ -2601,8 +2622,92 @@ class SpriteEditorItem(LevelEditorItem):
 
         self.InitialiseSprite()
 
+        self.listitem.setText(self.ListString())
+
         #self.scene().update(CurrentRect)
         #self.scene().update(self.x(), self.y(), self.BoundingRect.width(), self.BoundingRect.height())
+
+    SpritesThatActivateAnEvent = set((33,34,35,37,38,39,40,41,42,43,44,45,153,478,491,156,252))
+    SpritesThatActivateAnEventNyb0 = set((32,91,155,389))
+    SpritesTriggeredByAnEventNyb1 = set((23,27,28,30,31,36,49,81,82,83,84,85,86,91,106,122,129,144,149,161,178,182,191,260,285,305,368,395,420))
+    SpritesTriggeredByAnEventNyb0 = set((37,40,41,42,43,44,45,138,139,153,179,216,478,479))
+    StarCoinNumbers = set((32,155,197,389))
+    SpritesWithSetIDs = set((144,147,156,237,459,461))
+    SpritesWithMovementIDsNyb2 = set((155,172,205,207,208,209,221,226,236,260,261,343,354,376,402,403,460))
+    SpritesWithMovementIDsNyb3 = set((132,287))
+    SpritesWithMovementIDsNyb5 = set((90,159,160,214,284,305,420))
+    SpritesWithRotationIDs = set((96,149,182,252,253,254,255,256,259,274,276,277,278,306,331,346,361,362,366,438,452,455,457,458,))
+    SpritesWithLocationIDsNyb5 = set((53,64,138,139,216,435,446))
+    SpritesWithLocationIDsNyb5and0xF = set((154,217,234,258,269,293,426))
+    SpritesWithLocationIDsNyb4 = set((124,215,284))
+
+    def ListString(self):
+        """Returns a string that can be used to describe the sprite in a list"""
+        baseString = "%s (at %d,%d" % (self.name, self.objx, self.objy)
+
+        if self.type in self.SpritesTriggeredByAnEventNyb1 and self.spritedata[1] != '\0':
+            baseString += ', triggered by event %d' % ord(self.spritedata[1])
+        elif self.type in self.SpritesTriggeredByAnEventNyb0 and self.spritedata[0] != '\0':
+            baseString += ', triggered by event %d' % ord(self.spritedata[0])
+        elif self.type == 34:
+            baseString += ', triggered by events %d+%d+%d+%d' % (ord(self.spritedata[0]), ord(self.spritedata[2]), ord(self.spritedata[3]), ord(self.spritedata[4]))
+        elif self.type == 35:
+            baseString += ', triggered by event %d, %d, %d, or %d' % (ord(self.spritedata[0]), ord(self.spritedata[2]), ord(self.spritedata[3]), ord(self.spritedata[4]))
+            
+        if self.type in self.SpritesThatActivateAnEvent and self.type is not 39 and self.spritedata[1] != '\0':
+            baseString += ', activates event %d' % ord(self.spritedata[1])
+        elif self.type in self.SpritesThatActivateAnEventNyb0 and self.spritedata[0] != '\0':
+            baseString += ', activates event %d' % ord(self.spritedata[0])
+        elif self.type == 39:
+            baseString += ', activates events %d - %d' % (ord(self.spritedata[0]), ord(self.spritedata[1]))
+        elif self.type == 36:
+            baseString += ', activates event %d, %d, %d, or %d' % (ord(self.spritedata[0]), ord(self.spritedata[2]), ord(self.spritedata[3]), ord(self.spritedata[4]))
+
+        if self.type in self.StarCoinNumbers and self.type is not 197:
+            number = (ord(self.spritedata[4]) & 15) + 1
+            baseString += ', Star Coin %d' % number
+        elif self.type == 197 and (ord(self.spritedata[5]) & 15) == 1:
+            baseString += ', Star Coin 1'
+
+        if self.type in self.SpritesWithSetIDs and self.type is not 147:
+            baseString += ', Coin/Set ID %d' % (ord(self.spritedata[5]) & 15)
+        elif self.type == 147 and self.spritedata[2] != '\0':
+            baseString += ', Movement/Coin ID %d' % ord(self.spritedata[2])
+
+        if self.type in self.SpritesWithMovementIDsNyb2 and self.type is not 172 and self.type is not 382 and self.spritedata[2] != '\0':
+            baseString += ', Movement ID %d' % ord(self.spritedata[2])
+        elif self.type == 172 or self.type == 382 and ord(self.spritedata[2]) >> 4 != '\0':
+            baseString += ', Movement ID %d' % (ord(self.spritedata[2]) >> 4)
+
+        if self.type in self.SpritesWithMovementIDsNyb3 and self.spritedata[3] >> 4 != '\0':
+            baseString += ', Movement ID %d' % (ord(self.spritedata[3]) >> 4)
+
+        if self.type in self.SpritesWithMovementIDsNyb5 and self.type is not 284 and self.type is not 305 and self.type is not 420 and ord(self.spritedata[5]) >> 4:
+            baseString += ', Movement ID %d' % (ord(self.spritedata[5]) >> 4)
+        elif self.type == 284 or self.type == 305 or self.type == 420 and self.spritedata[5] != '\0':
+            baseString += ', Movement ID %d' % ord(self.spritedata[5])
+
+        if self.type in self.SpritesWithRotationIDs and self.spritedata[5] != '\0':
+            baseString += ', Rotation ID %d' % ord(self.spritedata[5])
+
+        if self.type in self.SpritesWithLocationIDsNyb5 and self.spritedata[5] != '\0':
+            baseString += ', Location ID %d' % ord(self.spritedata[5])
+        elif self.type in self.SpritesWithLocationIDsNyb5and0xF and ord(self.spritedata[5]) & 15 != '\0':
+            baseString += ', Location ID %d' % (ord(self.spritedata[5]) & 15)
+        elif self.type in self.SpritesWithLocationIDsNyb4 and self.spritedata[4] != '\0':
+            baseString += ', Location ID %d' % ord(self.spritedata[4])
+        elif self.type == 449 and self.spritedata[3] != '\0':
+            baseString += ', Location ID %d' % ord(self.spritedata[3])
+        elif self.type == 181 or self.type == 220: # nybble 8-9
+            if (((ord(self.spritedata[3]) & 0xF) << 4) | ((ord(self.spritedata[4]) & 0xF0) >> 4)) != '\0':
+                baseString += ', Location ID %d' % (((ord(self.spritedata[3]) & 0xF) << 4) | ((ord(self.spritedata[4]) & 0xF0) >> 4))
+        elif self.type == 262 and (((ord(self.spritedata[4]) & 0xF) << 4) | ((ord(self.spritedata[5]) & 0xF0) >> 4)) != '\0': # nybble 10-11
+            baseString += ', Location ID %d' % (((ord(self.spritedata[4]) & 0xF) << 4) | ((ord(self.spritedata[5]) & 0xF0) >> 4))
+
+        baseString += ')'
+
+        return baseString
+        
 
     def InitialiseSprite(self):
         """Initialises sprite and creates any auxiliary objects needed"""
@@ -2741,6 +2846,8 @@ class SpriteEditorItem(LevelEditorItem):
         if event.button() == QtCore.Qt.LeftButton:
             if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
                 newitem = SpriteEditorItem(self.type, self.objx, self.objy, self.spritedata)
+                newitem.listitem = QtGui.QListWidgetItem(newitem.ListString())
+                mainWindow.spriteList.addItem(spr.listitem)
                 Level.sprites.append(newitem)
                 mainWindow.scene.addItem(newitem)
                 mainWindow.scene.clearSelection()
@@ -2775,6 +2882,11 @@ class SpriteEditorItem(LevelEditorItem):
 
     def delete(self):
         """Delete the sprite from the level"""
+        sprlist = mainWindow.spriteList
+        mainWindow.UpdateFlag = True
+        sprlist.takeItem(sprlist.row(self.listitem))
+        mainWindow.UpdateFlag = False
+        sprlist.selectionModel().clearSelection()
         Level.sprites.remove(self)
         self.scene().update(self.x(), self.y(), self.BoundingRect.width(), self.BoundingRect.height())
 
@@ -4648,6 +4760,9 @@ class LevelViewWidget(QtGui.QGraphicsView):
                     spr.positionChanged = mw.HandleSprPosChange
                     mw.scene.addItem(spr)
 
+                    spr.listitem = QtGui.QListWidgetItem(spr.ListString())
+                    mw.spriteList.addItem(spr.listitem)
+
                     Level.sprites.append(spr)
 
                     self.currentobj = spr
@@ -5197,7 +5312,7 @@ class ObjectShiftDialog(QtGui.QDialog):
         buttonBox.rejected.connect(self.reject)
 
         moveLayout = QtGui.QFormLayout()
-        offsetlabel = QtGui.QLabel('Enter an offset in pixels - each block is 16 pixels wide/high. Note that normal objects can only be placed on 16x16 boundaries, so if the offset you enter isn\'t a multiple of 16, they won\'t be moved correctly.')
+        offsetlabel = QtGui.QLabel('Enter an offset in pixels - each block is 16 pixels wide/high. Note that normal objects can only be placed on 16x16 boundaries, so if the offset you enter isn\'t a multiple of 16, they won\'t be moved correctly. Positive values move right/down, negative values move left/up.')
         offsetlabel.setWordWrap(True)
         moveLayout.addWidget(offsetlabel)
         moveLayout.addRow('X:', self.XOffset)
@@ -5417,7 +5532,7 @@ class LoadingTab(QtGui.QWidget):
 
         self.timer = QtGui.QSpinBox()
         self.timer.setRange(0, 999)
-        self.timer.setToolTip("Sets the countdown timer on load from the world map. It's possible to set different times for the midpoint area.")
+        self.timer.setToolTip("Sets the countdown timer on load from the world map.")
         timerLabel = QtGui.QLabel("Timer:")
         self.timer.setValue(Level.timeLimit + 200)
 
@@ -5454,6 +5569,7 @@ class LoadingTab(QtGui.QWidget):
         eventLayout.addWidget(self.eventChooser)
 
         eventBox = QtGui.QGroupBox('Default Events')
+        eventBox.setToolTip("Check the following Event IDs to make them start already activated.")
         eventBox.setLayout(eventLayout)
 
         Layout = QtGui.QVBoxLayout()
@@ -6499,15 +6615,20 @@ class ReggieWindow(QtGui.QMainWindow):
         self.actions['freezeobjects'].setChecked(not ObjectsNonFrozen)
         self.CreateAction('freezesprites', self.HandleSpritesFreeze, None, 'Freeze Sprites', 'Make sprites non-selectable', QtGui.QKeySequence('Ctrl+Shift+2'), True)
         self.actions['freezesprites'].setChecked(not SpritesNonFrozen)
+        self.CreateAction('ShowSprites', self.HandleSpritesVisibility, GetIcon('ShowSprites'), 'Show Sprites', 'Toggle viewing of sprites', QtGui.QKeySequence('Ctrl+Shift+V'), True)
+        self.actions['ShowSprites'].setChecked(not SpritesNonHidden)
+        self.CreateAction('ShowLocations', self.HandleLocationsVisibility, GetIcon('locations'), 'Show Locations', 'Toggle viewing of locations', QtGui.QKeySequence('Ctrl+Shift+L'), True)
+        self.actions['ShowLocations'].setChecked(not LocationsHidden)
         self.CreateAction('freezeentrances', self.HandleEntrancesFreeze, None, 'Freeze Entrances', 'Make entrances non-selectable', QtGui.QKeySequence('Ctrl+Shift+3'), True)
         self.actions['freezeentrances'].setChecked(not EntrancesNonFrozen)
         self.CreateAction('freezelocations', self.HandleLocationsFreeze, None, 'Freeze Locations', 'Make locations non-selectable', QtGui.QKeySequence('Ctrl+Shift+4'), True)
         self.actions['freezelocations'].setChecked(not LocationsNonFrozen)
         self.CreateAction('freezepaths', self.HandlePathsFreeze, None, 'Freeze Paths', 'Make Paths non-selectable', QtGui.QKeySequence('Ctrl+Shift+5'), True)
         self.actions['freezepaths'].setChecked(not PathsNonFrozen)
+        self.CreateAction('TabNames', self.HandleTabNames, None, 'Tab Labels', 'Enable or Disable labels on tabs', QtGui.QKeySequence('Ctrl+Alt+L'), True)
+        self.actions['TabNames'].setChecked(not TabsNamed)
 
         self.CreateAction('zoommax', self.HandleZoomMax, GetIcon('zoommax'), 'Maximum Zoom', 'Zoom in all the way', QtGui.QKeySequence('Ctrl+PgDown'), False)
-        
         self.CreateAction('zoomin', self.HandleZoomIn, GetIcon('zoomin'), 'Zoom In', 'Zoom into the main level view', QtGui.QKeySequence.ZoomIn, False)
         self.CreateAction('zoomactual', self.HandleZoomActual, GetIcon('zoomactual'), 'Zoom 100%', 'Show the level at the default zoom', QtGui.QKeySequence('Ctrl+0'), False)
         self.CreateAction('zoomout', self.HandleZoomOut, GetIcon('zoomout'), 'Zoom Out', 'Zoom out of the main level view', QtGui.QKeySequence.ZoomOut, False)
@@ -6586,6 +6707,8 @@ class ReggieWindow(QtGui.QMainWindow):
         vmenu.addAction(self.actions['showlayer0'])
         vmenu.addAction(self.actions['showlayer1'])
         vmenu.addAction(self.actions['showlayer2'])
+        vmenu.addAction(self.actions['ShowSprites'])
+        vmenu.addAction(self.actions['ShowLocations'])
         vmenu.addSeparator()
         vmenu.addAction(self.actions['grid'])
         vmenu.addSeparator()
@@ -6608,6 +6731,8 @@ class ReggieWindow(QtGui.QMainWindow):
         lmenu.addAction(self.actions['deletearea'])
         lmenu.addSeparator()
         lmenu.addAction(self.actions['reloadgfx'])
+        lmenu.addSeparator()
+        lmenu.addAction(self.actions['TabNames'])
 
         hmenu = menubar.addMenu('&Help')
         hmenu.addAction(self.actions['infobox'])
@@ -6639,6 +6764,8 @@ class ReggieWindow(QtGui.QMainWindow):
         self.toolbar.addAction(self.actions['showlayer0'])
         self.toolbar.addAction(self.actions['showlayer1'])
         self.toolbar.addAction(self.actions['showlayer2'])
+        self.toolbar.addAction(self.actions['ShowSprites'])
+        self.toolbar.addAction(self.actions['ShowLocations'])
         self.toolbar.addSeparator()
         self.toolbar.addAction(self.actions['areaoptions'])
         self.toolbar.addAction(self.actions['zones'])
@@ -6796,7 +6923,7 @@ class ReggieWindow(QtGui.QMainWindow):
 
         # sprite choosing tabs
         self.sprPickerTab = QtGui.QWidget()
-        tabs.addTab(self.sprPickerTab, GetIcon('sprites'), 'Sprites')
+        tabs.addTab(self.sprPickerTab, GetIcon('sprites'), '')
 
         spl = QtGui.QVBoxLayout(self.sprPickerTab)
         self.sprPickerLayout = spl
@@ -6860,12 +6987,12 @@ class ReggieWindow(QtGui.QMainWindow):
 
         # entrance tab
         self.entEditorTab = QtGui.QWidget()
-        tabs.addTab(self.entEditorTab, GetIcon('entrances'), 'Entrances')
+        tabs.addTab(self.entEditorTab, GetIcon('entrances'), '')
 
         eel = QtGui.QVBoxLayout(self.entEditorTab)
         self.entEditorLayout = eel
 
-        elabel = QtGui.QLabel('Entrances currently in the level:<br>(Double-click one to jump to it instantly)')
+        elabel = QtGui.QLabel('Entrances currently in this Area:<br>(Double-click one to jump to it instantly)')
         elabel.setWordWrap(True)
         self.entranceList = QtGui.QListWidget()
         self.entranceList.itemActivated.connect(self.HandleEntranceSelectByList)
@@ -6875,12 +7002,12 @@ class ReggieWindow(QtGui.QMainWindow):
 
         # paths tab
         self.pathEditorTab = QtGui.QWidget()
-        tabs.addTab(self.pathEditorTab, GetIcon('paths'), 'Paths')
+        tabs.addTab(self.pathEditorTab, GetIcon('paths'), '')
 
         pathel = QtGui.QVBoxLayout(self.pathEditorTab)
         self.pathEditorLayout = pathel
 
-        pathlabel = QtGui.QLabel('Path nodes currently in the level:<br>(Double-click one to jump to its first node instantly)<br>To delete a path, remove all its nodes one by one.<br>To add new paths, hit the button below and right click.')
+        pathlabel = QtGui.QLabel('Path nodes currently in this Area:<br>(Double-click one to jump to its first node instantly)<br>To delete a path, remove all its nodes one by one.<br>To add new paths, hit the button below and right click.')
         pathlabel.setWordWrap(True)
         deselectbtn = QtGui.QPushButton('Deselect (then right click for new path)')
         deselectbtn.clicked.connect(self.DeselectPathSelection)
@@ -6890,6 +7017,21 @@ class ReggieWindow(QtGui.QMainWindow):
         pathel.addWidget(pathlabel)
         pathel.addWidget(deselectbtn)
         pathel.addWidget(self.pathList)
+
+        # spritelist tab
+        self.sprEditorTab = QtGui.QWidget()
+        tabs.addTab(self.sprEditorTab, GetIcon('spritelist'), '')
+
+        spel = QtGui.QVBoxLayout(self.sprEditorTab)
+        self.sprEditorLayout = spel
+
+        slabel = QtGui.QLabel('Sprites currently in this Area:<br>(Double-click one to jump to it instantly)')
+        slabel.setWordWrap(True)
+        self.spriteList = QtGui.QListWidget()
+        self.spriteList.itemActivated.connect(self.HandleSpriteSelectByList)
+
+        spel.addWidget(slabel)
+        spel.addWidget(self.spriteList)
 
     def DeselectPathSelection(self, checked):
         """meh"""
@@ -7334,6 +7476,8 @@ class ReggieWindow(QtGui.QMainWindow):
 
             for obj in items:
                 obj.setPos(obj.x() + xpoffset, obj.y() + ypoffset)
+                if isinstance(obj, type_spr) or isinstance(obj, type_ent):
+                    obj.listitem.setText(obj.ListString())
 
             OverrideSnapping = False
 
@@ -7716,6 +7860,61 @@ class ReggieWindow(QtGui.QMainWindow):
 
         self.scene.update()
 
+    @QtCore.pyqtSlot(bool)
+    def HandleSpritesVisibility(self, checked):
+        """Handle toggling of sprite visibility"""
+        settings.setValue('ShowSprites', checked)
+
+        checked = checked
+
+        global SpritesNonHidden
+        SpritesNonHidden = checked
+        flag1 = QtGui.QGraphicsItem.ItemIsSelectable
+        flag2 = QtGui.QGraphicsItem.ItemIsMovable
+
+        for spr in Level.sprites:
+            spr.setVisible(checked)
+
+        self.scene.update()
+
+    @QtCore.pyqtSlot(bool)
+    def HandleLocationsVisibility(self, checked):
+        """Handle toggling of location visibility"""
+        settings.setValue('ShowLocations', checked)
+
+        checked = checked
+
+        global LocationsHidden
+        LocationsHidden = checked
+        flag1 = QtGui.QGraphicsItem.ItemIsSelectable
+        flag2 = QtGui.QGraphicsItem.ItemIsMovable
+
+        for loc in Level.locations:
+            loc.setVisible(checked)
+
+        self.scene.update()
+
+
+    @QtCore.pyqtSlot(bool)
+    def HandleTabNames(self, checked):
+        """Handle toggling of tab names"""
+        settings.setValue('TabNames', checked)
+
+        checked = checked
+
+        global TabsNamed
+        TabsNamed = checked
+        
+        if TabsNamed == True:
+            self.creationTabs.setTabText(4, 'Sprites')
+            self.creationTabs.setTabText(5, 'Entrances')
+            self.creationTabs.setTabText(6, 'Paths')
+            self.creationTabs.setTabText(7, 'List')
+        else:
+            self.creationTabs.setTabText(4, '')
+            self.creationTabs.setTabText(5, '')
+            self.creationTabs.setTabText(6, '')
+            self.creationTabs.setTabText(7, '')
 
     @QtCore.pyqtSlot(bool)
     def HandleEntrancesFreeze(self, checked):
@@ -7983,6 +8182,10 @@ class ReggieWindow(QtGui.QMainWindow):
         pathlist.selectionModel().setCurrentIndex(QtCore.QModelIndex(), QtGui.QItemSelectionModel.Clear)
         #entlist.selectionModel().clearSelection()
 
+        sprlist = self.spriteList
+        sprlist.clear()
+        sprlist.selectionModel().setCurrentIndex(QtCore.QModelIndex(), QtGui.QItemSelectionModel.Clear)
+
         addItem = scene.addItem
 
         pcEvent = self.HandleObjPosChange
@@ -7994,6 +8197,8 @@ class ReggieWindow(QtGui.QMainWindow):
         pcEvent = self.HandleSprPosChange
         for spr in Level.sprites:
             spr.positionChanged = pcEvent
+            spr.listitem = QtGui.QListWidgetItem(spr.ListString())
+            sprlist.addItem(spr.listitem)
             addItem(spr)
 
         pcEvent = self.HandleEntPosChange
@@ -8047,6 +8252,9 @@ class ReggieWindow(QtGui.QMainWindow):
         self.actions['showlayer0'].setChecked(True)
         self.actions['showlayer1'].setChecked(True)
         self.actions['showlayer2'].setChecked(True)
+        self.actions['ShowSprites'].setChecked(True)
+        self.actions['ShowLocations'].setChecked(True)
+        self.actions['TabNames'].setChecked(False)
         self.actions['addarea'].setEnabled(Level.areacount < 4)
         self.actions['importarea'].setEnabled(Level.areacount < 4)
         self.actions['deletearea'].setEnabled(Level.areacount > 1)
@@ -8133,6 +8341,8 @@ class ReggieWindow(QtGui.QMainWindow):
             item = selitems[0]
             self.selObj = item
             if func_ii(item, type_spr):
+                self.spriteList.setCurrentItem(item.listitem)
+                self.UpdateFlag = False
                 showSpritePanel = True
                 updateModeInfo = True
             elif func_ii(item, type_ent):
@@ -8341,6 +8551,7 @@ class ReggieWindow(QtGui.QMainWindow):
 
     def HandleSprPosChange(self, obj, oldx, oldy, x, y):
         """Handle the sprite being dragged"""
+        obj.listitem.setText(obj.ListString())
         if obj == self.selObj:
             if oldx == x and oldy == y: return
             SetDirty()
@@ -8352,6 +8563,7 @@ class ReggieWindow(QtGui.QMainWindow):
         if self.spriteEditorDock.isVisible():
             obj = self.selObj
             obj.spritedata = data
+            obj.UpdateListString()
             SetDirty()
 
             if obj.dynamicSize:
@@ -8393,6 +8605,24 @@ class ReggieWindow(QtGui.QMainWindow):
         ent.ensureVisible(QtCore.QRectF(), 192, 192)
         self.scene.clearSelection()
         ent.setSelected(True)
+
+    @QtCore.pyqtSlot(QtGui.QListWidgetItem)
+    def HandleSpriteSelectByList(self, item):
+        """Handle an sprite being selected from the list"""
+        if self.UpdateFlag: return
+
+        # can't really think of any other way to do this
+        #item = self.spriteList.item(row)
+        spr = None
+        for check in Level.sprites:
+            if check.listitem == item:
+                spr = check
+                break
+        if spr == None: return
+
+        spr.ensureVisible(QtCore.QRectF(), 192, 192)
+        self.scene.clearSelection()
+        spr.setSelected(True)
 
     @QtCore.pyqtSlot(QtGui.QListWidgetItem)
     def HandlePathSelectByList(self, item):
@@ -8975,6 +9205,7 @@ def main():
     LoadSpriteData()
     LoadEntranceNames()
     LoadNumberFont()
+    LoadNumberFontBold()
     LoadOverrides()
     sprites.Setup()
 
@@ -8982,11 +9213,14 @@ def main():
     settings = QtCore.QSettings('Reggie', 'Reggie Level Editor')
 
     global EnableAlpha, GridEnabled
-    global ObjectsNonFrozen, SpritesNonFrozen, EntrancesNonFrozen, LocationsNonFrozen, PathsNonFrozen
+    global ObjectsNonFrozen, SpritesNonFrozen, SpritesNonHidden, EntrancesNonFrozen, LocationsNonFrozen, LocationsHidden, TabsNamed, PathsNonFrozen
 
     GridEnabled = (settings.value('GridEnabled', 'false').toPyObject() == 'true')
     ObjectsNonFrozen = (settings.value('FreezeObjects', 'false').toPyObject() == 'false')
     SpritesNonFrozen = (settings.value('FreezeSprites', 'false').toPyObject() == 'false')
+    SpritesNonHidden = (settings.value('ShowSprites', 'false').toPyObject() == 'false')
+    LocationsHidden = (settings.value('ShowLocations', 'false').toPyObject() == 'false')
+    TabsNamed = (settings.value('TabNames', 'false').toPyObject() == 'false')
     EntrancesNonFrozen = (settings.value('FreezeEntrances', 'false').toPyObject() == 'false')
     PathsNonFrozen = (settings.value('FreezePaths', 'false').toPyObject() == 'false')
     LocationsNonFrozen = (settings.value('FreezeLocations', 'false').toPyObject() == 'false')
